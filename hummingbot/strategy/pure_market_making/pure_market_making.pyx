@@ -646,7 +646,7 @@ cdef class PureMarketMakingStrategy(StrategyBase):
                                           f"making may be dangerous when markets or networks are unstable.")
 
 
-            self.c_cancel_orders_above_max_spread()
+           
 
             proposal = None
             asset_mid_price = Decimal("0")
@@ -666,6 +666,7 @@ cdef class PureMarketMakingStrategy(StrategyBase):
                 if not self._take_if_crossed:
                     self.c_filter_out_takers(proposal)
             self.c_cancel_active_orders(proposal)
+            self.c_cancel_orders_above_max_spread()
             self.c_cancel_hanging_orders()
             self.c_cancel_orders_below_min_spread()
             
@@ -752,6 +753,7 @@ cdef class PureMarketMakingStrategy(StrategyBase):
             proposal.sells = []
 
     cdef c_apply_ping_pong(self, object proposal):
+        self.logger().info(f"buy balance: {self._filled_buys_balance} , sell balance: {self._filled_sells_balance}")
         self._ping_pong_warning_lines = []
         if self._filled_buys_balance == self._filled_sells_balance:
             self._filled_buys_balance = self._filled_sells_balance = 0
@@ -1003,6 +1005,11 @@ cdef class PureMarketMakingStrategy(StrategyBase):
             str order_id = order_completed_event.order_id
             LimitOrder limit_order_record = self._sb_order_tracker.c_get_limit_order(self._market_info, order_id)
         if limit_order_record is None:
+            self._filled_sells_balance += 1
+            self.log_with_clock(
+                    logging.INFO,
+                    f"Successfully dumped stocl!"
+                )
             return
         active_buy_ids = [x.client_order_id for x in self.active_orders if x.is_buy]
         if self._hanging_orders_enabled:
@@ -1154,7 +1161,7 @@ cdef class PureMarketMakingStrategy(StrategyBase):
                         )
      
                     ask_order_id = self.c_sell_with_specific_market(self._market_info, order.quantity)
-                    self._filled_sells_balance += 1 # for pingpong
+                    #self._filled_sells_balance += 1 # for pingpong
 
             
                     
