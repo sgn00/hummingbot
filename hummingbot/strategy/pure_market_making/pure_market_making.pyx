@@ -1151,6 +1151,7 @@ cdef class PureMarketMakingStrategy(StrategyBase):
                         )
      
                     ask_order_id = self.c_sell_with_specific_market(self._market_info, order.quantity)
+                    self._filled_sells_balance += 1 # for pingpong
 
             
                     
