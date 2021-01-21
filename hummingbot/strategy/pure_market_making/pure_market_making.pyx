@@ -1128,7 +1128,7 @@ cdef class PureMarketMakingStrategy(StrategyBase):
                          if order.client_order_id not in self._hanging_order_ids]
         for order in active_orders:
             if order.is_sell:
-            negation = 1
+                negation = 1
                 if (negation * (order.price - price) / price) > self._max_spread:
                     self.logger().info(f"Order is anove max spread ({self._max_spread})."
                                        f" Cancelling Order: ({'Buy' if order.is_buy else 'Sell'}) "
