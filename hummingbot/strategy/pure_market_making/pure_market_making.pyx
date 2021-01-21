@@ -90,6 +90,7 @@ cdef class PureMarketMakingStrategy(StrategyBase):
                  logging_options: int = OPTION_LOG_ALL,
                  status_report_interval: float = 900,
                  minimum_spread: Decimal = Decimal(0),
+                 max_spread: Decimal = Decimal(0),
                  hb_app_notification: bool = False,
                  order_override: Dict[str, List[str]] = {},
                  ):
@@ -103,6 +104,7 @@ cdef class PureMarketMakingStrategy(StrategyBase):
         self._bid_spread = bid_spread
         self._ask_spread = ask_spread
         self._minimum_spread = minimum_spread
+        self._max_spread = max_spread
         self._order_amount = order_amount
         self._order_levels = order_levels
         self._buy_levels = order_levels
@@ -663,6 +665,7 @@ cdef class PureMarketMakingStrategy(StrategyBase):
             self.c_cancel_active_orders(proposal)
             self.c_cancel_hanging_orders()
             self.c_cancel_orders_below_min_spread()
+            self.c_cancel_orders_above_max_spread()
             refresh_proposal = self.c_aged_order_refresh()
             # Firstly restore cancelled aged order
             if refresh_proposal is not None:
@@ -1115,6 +1118,22 @@ cdef class PureMarketMakingStrategy(StrategyBase):
                                    f" Cancelling Order: ({'Buy' if order.is_buy else 'Sell'}) "
                                    f"ID - {order.client_order_id}")
                 self.c_cancel_order(self._market_info, order.client_order_id)
+
+    # Max spread
+    cdef c_cancel_orders_above_max_spread(self):
+        cdef:
+            list active_orders = self.market_info_to_active_orders.get(self._market_info, [])
+            object price = self.get_price()
+        active_orders = [order for order in active_orders
+                         if order.client_order_id not in self._hanging_order_ids]
+        for order in active_orders:
+            if order.is_sell:
+            negation = 1
+                if (negation * (order.price - price) / price) > self._max_spread:
+                    self.logger().info(f"Order is anove max spread ({self._max_spread})."
+                                       f" Cancelling Order: ({'Buy' if order.is_buy else 'Sell'}) "
+                                       f"ID - {order.client_order_id}")
+                    self.c_cancel_order(self._market_info, order.client_order_id)
 
     # Refresh all active order that are older that the _max_order_age
     cdef c_aged_order_refresh(self):

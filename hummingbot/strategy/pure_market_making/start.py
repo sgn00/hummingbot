@@ -23,6 +23,7 @@ def start(self):
         bid_spread = c_map.get("bid_spread").value / Decimal('100')
         ask_spread = c_map.get("ask_spread").value / Decimal('100')
         minimum_spread = c_map.get("minimum_spread").value / Decimal('100')
+        max_spread = c_map.get("max_spread").value / Decimal('100')
         price_ceiling = c_map.get("price_ceiling").value
         price_floor = c_map.get("price_floor").value
         ping_pong_enabled = c_map.get("ping_pong_enabled").value
@@ -99,6 +100,7 @@ def start(self):
             hanging_orders_cancel_pct=hanging_orders_cancel_pct,
             order_refresh_tolerance_pct=order_refresh_tolerance_pct,
             minimum_spread=minimum_spread,
+            max_spread=max_spread,
             hb_app_notification=True,
             order_override={} if order_override is None else order_override,
         )
