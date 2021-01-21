@@ -72,6 +72,7 @@ cdef class PureMarketMakingStrategy(StrategyBase):
     cdef c_cancel_active_orders(self, object proposal)
     cdef c_cancel_hanging_orders(self)
     cdef c_cancel_orders_below_min_spread(self)
+    cdef c_cancel_orders_above_max_spread(self)
     cdef c_aged_order_refresh(self)
     cdef bint c_to_create_orders(self, object proposal)
     cdef c_execute_orders_proposal(self, object proposal)
