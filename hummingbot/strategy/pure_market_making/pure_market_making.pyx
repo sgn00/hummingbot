@@ -1141,7 +1141,7 @@ cdef class PureMarketMakingStrategy(StrategyBase):
                                        f"ID - {order.client_order_id}")
                     self.c_cancel_order(self._market_info, order.client_order_id)
                     price = market.c_get_price(self.trading_pair, False) # get top bid
-                    sells.append(PriceSize(price, order.size))
+                    sells.append(PriceSize(price, order.quantity))
                     self.logger().info(f"Placing order to dump & sell!!")
                     self.c_execute_orders_proposal(Proposal(buys, sells))
                     
