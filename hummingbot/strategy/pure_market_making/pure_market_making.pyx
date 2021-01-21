@@ -1124,6 +1124,10 @@ cdef class PureMarketMakingStrategy(StrategyBase):
         cdef:
             list active_orders = self.market_info_to_active_orders.get(self._market_info, [])
             object price = self.get_price()
+            ExchangeBase market = self._market_info.market
+            list buys = []
+            list sells = []
+            
         active_orders = [order for order in active_orders
                          if order.client_order_id not in self._hanging_order_ids]
         for order in active_orders:
@@ -1136,6 +1140,11 @@ cdef class PureMarketMakingStrategy(StrategyBase):
                                        f" Cancelling Order: ({'Buy' if order.is_buy else 'Sell'}) "
                                        f"ID - {order.client_order_id}")
                     self.c_cancel_order(self._market_info, order.client_order_id)
+                    price = market.c_get_price(self.trading_pair, False) # get top bid
+                    sells.append(PriceSize(price, order.size))
+                    self.logger().info(f"Placing order to dump & sell!!")
+                    self.c_execute_orders_proposal(self, Proposal(buys, sells))
+                    
 
     # Refresh all active order that are older that the _max_order_age
     cdef c_aged_order_refresh(self):
