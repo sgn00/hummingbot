@@ -12,14 +12,16 @@ class AdjustSellTime(ScriptBase):
     If a sell order is filled, there will be one less sell order submitted at the next refresh cycle.
     The balance is positive if there are more completed buy orders than sell orders.
     """
+    original_refresh_time = 0
 
     def __init__(self):
         super().__init__()
 
     def on_buy_order_completed(self, event: BuyOrderCompletedEvent):
+        original_refresh_time = self.pmm_parameters.order_refresh_time
         self.pmm_parameters.order_refresh_time = 100000
 
     def on_sell_order_completed(self, event: SellOrderCompletedEvent):
-        self.pmm_parameters.order_refresh_time = 900
+        self.pmm_parameters.order_refresh_time = original_refresh_time
 
 
