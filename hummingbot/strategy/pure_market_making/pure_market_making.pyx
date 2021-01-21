@@ -1008,8 +1008,11 @@ cdef class PureMarketMakingStrategy(StrategyBase):
             self._filled_sells_balance += 1
             self.log_with_clock(
                     logging.INFO,
-                    f"Successfully dumped stocl!"
+                    f"Successfully dumped stock!"
                 )
+            # delay order creation by filled_order_dalay (in seconds)
+            self._create_timestamp = self._current_timestamp + self._filled_order_delay
+            self._cancel_timestamp = min(self._cancel_timestamp, self._create_timestamp)
             return
         active_buy_ids = [x.client_order_id for x in self.active_orders if x.is_buy]
         if self._hanging_orders_enabled:
