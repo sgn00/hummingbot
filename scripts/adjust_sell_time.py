@@ -17,7 +17,7 @@ class AdjustSellTime(ScriptBase):
         super().__init__()
 
     def on_buy_order_completed(self, event: BuyOrderCompletedEvent):
-        self.pmm_parameters.order_refresh_time = 2700
+        self.pmm_parameters.order_refresh_time = 100000
 
     def on_sell_order_completed(self, event: SellOrderCompletedEvent):
         self.pmm_parameters.order_refresh_time = 900

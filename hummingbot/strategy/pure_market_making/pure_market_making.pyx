@@ -1133,17 +1133,26 @@ cdef class PureMarketMakingStrategy(StrategyBase):
         for order in active_orders:
             if not order.is_buy:
                 check_price = (order.price - price) / price
-                self.logger().info(f"{self._max_spread}")
-                self.logger().info(f"{check_price}")
                 if ((order.price - price) / price) > self._max_spread:
                     self.logger().info(f"Order is anove max spread ({self._max_spread})."
                                        f" Cancelling Order: ({'Buy' if order.is_buy else 'Sell'}) "
                                        f"ID - {order.client_order_id}")
                     self.c_cancel_order(self._market_info, order.client_order_id)
-                    price = market.c_get_price(self.trading_pair, False) # get top bid
-                    sells.append(PriceSize(price, order.quantity))
+                    #price = market.c_get_price(self.trading_pair, False) # get top bid
+                    #sells.append(PriceSize(price, order.quantity))
                     self.logger().info(f"Placing order to dump & sell!!")
-                    self.c_execute_orders_proposal(Proposal(buys, sells))
+                    #self.c_execute_orders_proposal(Proposal(buys, sells))
+                    
+                    
+                    if self._logging_options & self.OPTION_LOG_CREATE_ORDER:
+                        self.logger().info(
+                            f"({self.trading_pair}) Creating 1 ask "
+                            f"orders at (Size, MARKET)}"
+                        )
+     
+                    ask_order_id = self.c_sell_with_specific_market(self._market_info, order.quantity)
+
+            
                     
 
     # Refresh all active order that are older that the _max_order_age
