@@ -1147,7 +1147,7 @@ cdef class PureMarketMakingStrategy(StrategyBase):
                     if self._logging_options & self.OPTION_LOG_CREATE_ORDER:
                         self.logger().info(
                             f"({self.trading_pair}) Creating 1 ask "
-                            f"orders at ({order.quantity}, MARKET)"
+                            f"orders at ({order.quantity}, MARKET) to dump and SELL!!"
                         )
      
                     ask_order_id = self.c_sell_with_specific_market(self._market_info, order.quantity)
