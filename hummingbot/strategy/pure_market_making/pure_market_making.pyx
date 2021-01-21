@@ -1128,7 +1128,7 @@ cdef class PureMarketMakingStrategy(StrategyBase):
                          if order.client_order_id not in self._hanging_order_ids]
         for order in active_orders:
             if order.is_sell:
-                check_price = (order.price - price) / price)
+                check_price = (order.price - price) / price
                 self.logger().info(f"{self._max_spread}")
                 self.logger().info(f"{check_price}")
                 if ((order.price - price) / price) > self._max_spread:
