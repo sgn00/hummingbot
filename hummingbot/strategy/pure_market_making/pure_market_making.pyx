@@ -645,6 +645,9 @@ cdef class PureMarketMakingStrategy(StrategyBase):
                     self.logger().warning(f"WARNING: Some markets are not connected or are down at the moment. Market "
                                           f"making may be dangerous when markets or networks are unstable.")
 
+
+            self.c_cancel_orders_above_max_spread()
+
             proposal = None
             asset_mid_price = Decimal("0")
             # asset_mid_price = self.c_set_mid_price(market_info)
@@ -665,7 +668,7 @@ cdef class PureMarketMakingStrategy(StrategyBase):
             self.c_cancel_active_orders(proposal)
             self.c_cancel_hanging_orders()
             self.c_cancel_orders_below_min_spread()
-            self.c_cancel_orders_above_max_spread()
+            
             refresh_proposal = self.c_aged_order_refresh()
             # Firstly restore cancelled aged order
             if refresh_proposal is not None:
