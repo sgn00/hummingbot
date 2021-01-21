@@ -1143,7 +1143,7 @@ cdef class PureMarketMakingStrategy(StrategyBase):
                     price = market.c_get_price(self.trading_pair, False) # get top bid
                     sells.append(PriceSize(price, order.size))
                     self.logger().info(f"Placing order to dump & sell!!")
-                    self.c_execute_orders_proposal(self, Proposal(buys, sells))
+                    self.c_execute_orders_proposal(Proposal(buys, sells))
                     
 
     # Refresh all active order that are older that the _max_order_age
